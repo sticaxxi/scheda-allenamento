@@ -9,573 +9,136 @@
 <meta name="theme-color" content="#0d1117">
 <title>Scheda Allenamento</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏋️</text></svg>">
-<link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏋️</text></svg>">
 <style>
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&family=Space+Mono:wght@400;700&display=swap');
-
-:root {
-  --bg: #0D1117; --bg2: #161B22; --bg3: #1C2333; --card: #1C2333;
-  --border: #2D3748; --text: #E6EDF3; --text2: #8B949E;
-  --accent: #58A6FF; --green: #3FB950; --orange: #F0883E;
-  --red: #F85149; --purple: #BC8CFF; --yellow: #E3B341;
-  --font: 'DM Sans', -apple-system, sans-serif;
-  --mono: 'Space Mono', monospace;
-}
-
-* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-html { font-size: 16px; scroll-behavior: smooth; }
-body {
-  font-family: var(--font); background: var(--bg); color: var(--text);
-  min-height: 100dvh; overflow-x: hidden; -webkit-font-smoothing: antialiased;
-  padding-bottom: env(safe-area-inset-bottom);
-}
-
-/* ── Top Bar ── */
-.top-bar {
-  position: sticky; top: 0; z-index: 100;
-  background: rgba(13,17,23,0.88); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
-  border-bottom: 1px solid var(--border); padding: 14px 20px;
-  display: flex; align-items: center; justify-content: space-between;
-}
-.top-bar h1 {
-  font-size: 1.1rem; font-weight: 700; letter-spacing: -0.03em;
-  background: linear-gradient(135deg, var(--accent), var(--purple));
-  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-}
-.week-badge {
-  font-family: var(--mono); font-size: 0.7rem; color: var(--text2);
-  background: var(--bg3); padding: 5px 12px; border-radius: 20px; letter-spacing: 0.05em;
-}
-
-/* ── Week Selector ── */
-.week-row { display: flex; gap: 8px; padding: 14px 16px; overflow-x: auto; scrollbar-width: none; }
-.week-row::-webkit-scrollbar { display: none; }
-.wk-btn {
-  all: unset; cursor: pointer; flex-shrink: 0;
-  font-family: var(--font); font-size: 0.82rem; font-weight: 500;
-  padding: 10px 20px; border-radius: 12px;
-  border: 1.5px solid var(--border); background: var(--bg2); color: var(--text2);
-  transition: all 0.25s; display: flex; flex-direction: column; align-items: center; gap: 3px;
-}
-.wk-btn span { font-family: var(--mono); font-size: 0.62rem; opacity: 0.6; }
-.wk-btn.on {
-  background: rgba(88,166,255,0.12); border-color: var(--accent); color: var(--accent);
-}
-.wk-btn.on span { opacity: 1; }
-
-/* ── Progress ── */
-.prog-wrap { padding: 2px 20px 8px; }
-.prog-bar { height: 5px; background: var(--bg3); border-radius: 5px; overflow: hidden; }
-.prog-fill {
-  height: 100%; border-radius: 5px; transition: width 0.45s ease;
-  background: linear-gradient(90deg, var(--accent), var(--green));
-}
-.prog-txt {
-  font-family: var(--mono); font-size: 0.62rem; color: var(--text2);
-  text-align: right; margin-top: 4px;
-}
-
-/* ── Day Tabs ── */
-.day-row { display: flex; gap: 6px; padding: 0 16px 10px; }
-.dy-btn {
-  all: unset; cursor: pointer; flex: 1; text-align: center;
-  font-family: var(--font); font-size: 0.82rem; font-weight: 600;
-  padding: 12px 6px; border-radius: 10px;
-  background: var(--bg2); color: var(--text2); position: relative; transition: all 0.2s;
-}
-.dy-btn.on { background: var(--accent); color: #fff; }
-.dy-btn.bonus { border: 1.5px dashed var(--orange); }
-.dy-btn.bonus.on { background: var(--orange); border-color: var(--orange); color: #fff; }
-.dy-badge {
-  position: absolute; top: -7px; right: -3px;
-  font-family: var(--mono); font-size: 0.52rem; font-weight: 700;
-  background: var(--green); color: #fff; padding: 1px 6px; border-radius: 8px; display: none;
-}
-.dy-badge.show { display: block; }
-
-/* ── Quick Timers ── */
-.qt-row { display: flex; gap: 8px; padding: 6px 16px 6px; }
-.qt-btn {
-  all: unset; cursor: pointer;
-  font-family: var(--mono); font-size: 0.72rem; font-weight: 700;
-  padding: 8px 16px; border-radius: 20px;
-  border: 1.5px solid var(--border); background: var(--bg2); color: var(--text2);
-  transition: all 0.15s;
-}
-.qt-btn:active { background: var(--accent); color: #fff; border-color: var(--accent); transform: scale(0.95); }
-
-/* ── Section Headers ── */
-.sec-hdr {
-  display: flex; align-items: center; gap: 10px;
-  margin: 22px 0 8px; padding-bottom: 8px;
-}
-.sec-hdr .ico { font-size: 1.15rem; }
-.sec-hdr h2 { font-size: 0.92rem; font-weight: 700; letter-spacing: -0.01em; }
-.sec-hdr.rehab { border-bottom: 2px solid var(--red); }
-.sec-hdr.rehab h2 { color: var(--red); }
-.sec-hdr.warm { border-bottom: 2px solid var(--orange); }
-.sec-hdr.warm h2 { color: var(--orange); }
-.sec-hdr.main { border-bottom: 2px solid var(--accent); }
-.sec-hdr.main h2 { color: var(--accent); }
-.sec-hdr.cool { border-bottom: 2px solid var(--green); }
-.sec-hdr.cool h2 { color: var(--green); }
-.sec-note { font-size: 0.76rem; color: var(--text2); font-style: italic; margin-bottom: 10px; padding-left: 4px; }
-
-/* ── Day Title ── */
-.day-title { font-size: 1.15rem; font-weight: 700; margin: 16px 0 4px; }
-
-/* ── Exercise Cards ── */
-.ex {
-  display: flex; align-items: center; gap: 14px; padding: 14px 16px;
-  background: var(--card); border: 1px solid var(--border); border-radius: 12px;
-  margin-bottom: 8px; cursor: pointer; transition: all 0.25s ease;
-  animation: fadeUp 0.3s ease both;
-}
-.ex:active { transform: scale(0.985); }
-.ex.done { opacity: 0.4; background: var(--bg); border-color: rgba(63,185,80,0.4); }
-.ex.done .ex-name { text-decoration: line-through; }
-.chk {
-  width: 28px; height: 28px; flex-shrink: 0; border-radius: 50%;
-  border: 2px solid var(--border); display: flex; align-items: center; justify-content: center;
-  font-size: 0.75rem; color: transparent; transition: all 0.2s;
-}
-.ex.done .chk { background: var(--green); border-color: var(--green); color: #fff; }
-.ex-info { flex: 1; min-width: 0; }
-.ex-name { font-size: 0.88rem; font-weight: 600; margin-bottom: 4px; line-height: 1.3; }
-.ex-meta { display: flex; gap: 10px; flex-wrap: wrap; }
-.ex-meta span {
-  font-family: var(--mono); font-size: 0.68rem; padding: 2px 8px;
-  border-radius: 6px; background: var(--bg);
-}
-.ex-meta .s { color: var(--accent); }
-.ex-meta .r { color: var(--purple); }
-.ex-notes { font-size: 0.74rem; color: var(--text2); margin-top: 5px; font-style: italic; }
-
-@keyframes fadeUp {
-  from { opacity: 0; transform: translateY(6px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-.ex:nth-child(2) { animation-delay: .02s } .ex:nth-child(3) { animation-delay: .04s }
-.ex:nth-child(4) { animation-delay: .06s } .ex:nth-child(5) { animation-delay: .08s }
-.ex:nth-child(6) { animation-delay: .10s } .ex:nth-child(7) { animation-delay: .12s }
-.ex:nth-child(8) { animation-delay: .14s } .ex:nth-child(9) { animation-delay: .16s }
-
-/* ── Reset ── */
-.reset-row { display: flex; justify-content: center; padding: 24px; }
-.reset-btn {
-  all: unset; cursor: pointer;
-  font-family: var(--font); font-size: 0.78rem; font-weight: 500;
-  padding: 10px 28px; border-radius: 10px;
-  border: 1px solid var(--border); background: var(--bg2); color: var(--text2);
-}
-.reset-btn:active { background: rgba(248,81,73,0.1); color: var(--red); border-color: var(--red); }
-
-/* ── Timer Bar ── */
-.timer-bar {
-  position: fixed; bottom: 0; left: 0; right: 0; z-index: 200;
-  background: rgba(22,27,34,0.96); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
-  border-top: 1px solid var(--border);
-  padding: 14px 20px; padding-bottom: max(14px, env(safe-area-inset-bottom));
-  display: flex; align-items: center; gap: 14px;
-  transform: translateY(110%); transition: transform 0.4s cubic-bezier(0.16,1,0.3,1);
-}
-.timer-bar.vis { transform: translateY(0); }
-.t-display {
-  font-family: var(--mono); font-size: 2.2rem; font-weight: 700;
-  min-width: 100px; text-align: center; letter-spacing: 0.04em; color: var(--accent);
-}
-.t-display.warn { color: var(--orange); }
-.t-display.go { color: var(--green); }
-.t-info { flex: 1; }
-.t-info strong { display: block; font-size: 0.88rem; color: var(--text); }
-.t-info span { font-size: 0.75rem; color: var(--text2); }
-.t-btns { display: flex; gap: 8px; }
-.t-btn {
-  all: unset; cursor: pointer;
-  width: 44px; height: 44px; border-radius: 50%;
-  display: flex; align-items: center; justify-content: center; font-size: 1.1rem;
-  transition: all 0.15s;
-}
-.t-btn:active { transform: scale(0.88); }
-.t-btn.pri { background: var(--accent); color: #fff; }
-.t-btn.sec { background: var(--bg3); color: var(--text2); border: 1px solid var(--border); }
-
-/* ── Confetti ── */
-.confetti { position: fixed; top: 0; left: 0; right: 0; bottom: 0; pointer-events: none; z-index: 999; }
-@keyframes cfall {
-  0% { transform: translateY(0) rotate(0deg) scale(1); opacity: 1; }
-  100% { transform: translateY(105vh) rotate(800deg) scale(0.2); opacity: 0; }
-}
-
-/* ── Content ── */
-.content { padding: 0 14px 30px; }
-
-/* ── Landscape optimization for iPad ── */
-@media (min-width: 768px) {
-  .content { max-width: 680px; margin: 0 auto; }
-  .top-bar, .week-row, .day-row, .qt-row, .prog-wrap { max-width: 720px; margin-left: auto; margin-right: auto; }
-}
+:root{--bg:#0D1117;--bg2:#161B22;--bg3:#1C2333;--card:#1C2333;--border:#2D3748;--text:#E6EDF3;--text2:#8B949E;--accent:#58A6FF;--green:#3FB950;--orange:#F0883E;--red:#F85149;--purple:#BC8CFF;--yellow:#E3B341;--font:'DM Sans',-apple-system,sans-serif;--mono:'Space Mono',monospace}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100dvh;-webkit-font-smoothing:antialiased;padding-bottom:env(safe-area-inset-bottom)}
+.top-bar{position:sticky;top:0;z-index:100;background:rgba(13,17,23,.88);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border-bottom:1px solid var(--border);padding:14px 20px;display:flex;align-items:center;justify-content:space-between}
+.top-bar h1{font-size:1.1rem;font-weight:700;background:linear-gradient(135deg,var(--accent),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.wk-badge{font-family:var(--mono);font-size:.7rem;color:var(--text2);background:var(--bg3);padding:5px 12px;border-radius:20px}
+.week-row{display:flex;gap:8px;padding:14px 16px;overflow-x:auto;scrollbar-width:none}.week-row::-webkit-scrollbar{display:none}
+.wk-btn{all:unset;cursor:pointer;flex-shrink:0;font-family:var(--font);font-size:.82rem;font-weight:500;padding:10px 20px;border-radius:12px;border:1.5px solid var(--border);background:var(--bg2);color:var(--text2);transition:all .25s;display:flex;flex-direction:column;align-items:center;gap:3px}
+.wk-btn span{font-family:var(--mono);font-size:.62rem;opacity:.6}
+.wk-btn.on{background:rgba(88,166,255,.12);border-color:var(--accent);color:var(--accent)}.wk-btn.on span{opacity:1}
+.prog-wrap{padding:2px 20px 8px}.prog-bar{height:5px;background:var(--bg3);border-radius:5px;overflow:hidden}
+.prog-fill{height:100%;border-radius:5px;transition:width .45s;background:linear-gradient(90deg,var(--accent),var(--green))}
+.prog-txt{font-family:var(--mono);font-size:.62rem;color:var(--text2);text-align:right;margin-top:4px}
+.day-row{display:flex;gap:6px;padding:0 16px 10px}
+.dy-btn{all:unset;cursor:pointer;flex:1;text-align:center;font-family:var(--font);font-size:.82rem;font-weight:600;padding:12px 6px;border-radius:10px;background:var(--bg2);color:var(--text2);position:relative;transition:all .2s}
+.dy-btn.on{background:var(--accent);color:#fff}.dy-btn.bonus{border:1.5px dashed var(--orange)}.dy-btn.bonus.on{background:var(--orange);border-color:var(--orange);color:#fff}
+.dy-badge{position:absolute;top:-7px;right:-3px;font-family:var(--mono);font-size:.52rem;font-weight:700;background:var(--green);color:#fff;padding:1px 6px;border-radius:8px;display:none}.dy-badge.show{display:block}
+.qt-row{display:flex;gap:8px;padding:6px 16px}
+.qt-btn{all:unset;cursor:pointer;font-family:var(--mono);font-size:.72rem;font-weight:700;padding:8px 16px;border-radius:20px;border:1.5px solid var(--border);background:var(--bg2);color:var(--text2);transition:all .15s}
+.qt-btn:active{background:var(--accent);color:#fff;border-color:var(--accent);transform:scale(.95)}
+.sec-hdr{display:flex;align-items:center;gap:10px;margin:22px 0 8px;padding-bottom:8px}
+.sec-hdr .ico{font-size:1.15rem}.sec-hdr h2{font-size:.92rem;font-weight:700}
+.sec-hdr.rehab{border-bottom:2px solid var(--red)}.sec-hdr.rehab h2{color:var(--red)}
+.sec-hdr.warm{border-bottom:2px solid var(--orange)}.sec-hdr.warm h2{color:var(--orange)}
+.sec-hdr.main{border-bottom:2px solid var(--accent)}.sec-hdr.main h2{color:var(--accent)}
+.sec-hdr.cool{border-bottom:2px solid var(--green)}.sec-hdr.cool h2{color:var(--green)}
+.sec-note{font-size:.76rem;color:var(--text2);font-style:italic;margin-bottom:10px;padding-left:4px}
+.day-title{font-size:1.15rem;font-weight:700;margin:16px 0 4px}
+.ex{background:var(--card);border:1px solid var(--border);border-radius:12px;margin-bottom:8px;cursor:pointer;transition:all .25s;animation:fadeUp .3s ease both;overflow:hidden}
+.ex:active{transform:scale(.985)}.ex.done{opacity:.4;background:var(--bg);border-color:rgba(63,185,80,.4)}.ex.done .ex-name{text-decoration:line-through}
+.ex-top{display:flex;align-items:center;gap:14px;padding:14px 16px}
+.chk{width:28px;height:28px;flex-shrink:0;border-radius:50%;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:.75rem;color:transparent;transition:all .2s}
+.ex.done .chk{background:var(--green);border-color:var(--green);color:#fff}
+.ex-info{flex:1;min-width:0}.ex-name{font-size:.88rem;font-weight:600;margin-bottom:4px;line-height:1.3}
+.ex-meta{display:flex;gap:10px;flex-wrap:wrap}.ex-meta span{font-family:var(--mono);font-size:.68rem;padding:2px 8px;border-radius:6px;background:var(--bg)}
+.ex-meta .s{color:var(--accent)}.ex-meta .r{color:var(--purple)}
+.ex-notes{font-size:.74rem;color:var(--text2);margin-top:5px;font-style:italic}
+.info-toggle{all:unset;cursor:pointer;width:30px;height:30px;flex-shrink:0;border-radius:8px;background:var(--bg);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:.8rem;color:var(--text2);transition:all .2s}
+.info-toggle:active{background:var(--accent);color:#fff}.info-toggle.open{background:rgba(88,166,255,.15);color:var(--accent);border-color:var(--accent)}
+.ex-desc{max-height:0;overflow:hidden;transition:max-height .35s ease,padding .35s ease;padding:0 16px;background:rgba(88,166,255,.04);border-top:1px solid transparent}
+.ex-desc.open{max-height:300px;padding:12px 16px;border-top:1px solid var(--border)}
+.ex-desc p{font-size:.8rem;color:var(--text2);line-height:1.55;margin:0}
+.ex-desc .how-label{font-size:.68rem;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px}
+@keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.ex:nth-child(2){animation-delay:.03s}.ex:nth-child(3){animation-delay:.06s}.ex:nth-child(4){animation-delay:.09s}.ex:nth-child(5){animation-delay:.12s}
+.reset-row{display:flex;justify-content:center;padding:24px}
+.reset-btn{all:unset;cursor:pointer;font-family:var(--font);font-size:.78rem;font-weight:500;padding:10px 28px;border-radius:10px;border:1px solid var(--border);background:var(--bg2);color:var(--text2)}
+.reset-btn:active{background:rgba(248,81,73,.1);color:var(--red);border-color:var(--red)}
+.timer-bar{position:fixed;bottom:0;left:0;right:0;z-index:200;background:rgba(22,27,34,.96);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border-top:1px solid var(--border);padding:14px 20px;padding-bottom:max(14px,env(safe-area-inset-bottom));display:flex;align-items:center;gap:14px;transform:translateY(110%);transition:transform .4s cubic-bezier(.16,1,.3,1)}
+.timer-bar.vis{transform:translateY(0)}
+.t-display{font-family:var(--mono);font-size:2.2rem;font-weight:700;min-width:100px;text-align:center;color:var(--accent)}.t-display.warn{color:var(--orange)}.t-display.go{color:var(--green)}
+.t-info{flex:1}.t-info strong{display:block;font-size:.88rem}.t-info span{font-size:.75rem;color:var(--text2)}
+.t-btns{display:flex;gap:8px}
+.t-btn{all:unset;cursor:pointer;width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.1rem;transition:all .15s}.t-btn:active{transform:scale(.88)}
+.t-btn.pri{background:var(--accent);color:#fff}.t-btn.sec{background:var(--bg3);color:var(--text2);border:1px solid var(--border)}
+.confetti{position:fixed;top:0;left:0;right:0;bottom:0;pointer-events:none;z-index:999}
+@keyframes cfall{0%{transform:translateY(0) rotate(0deg);opacity:1}100%{transform:translateY(105vh) rotate(800deg);opacity:0}}
+.content{padding:0 14px 30px}
+@media(min-width:768px){.content{max-width:680px;margin:0 auto}.top-bar,.week-row,.day-row,.qt-row,.prog-wrap{max-width:720px;margin-left:auto;margin-right:auto}}
 </style>
 </head>
 <body>
-
-<div class="top-bar">
-  <h1>🏋️ Scheda Allenamento</h1>
-  <div class="week-badge" id="wBadge">SETT 1-2</div>
-</div>
+<div class="top-bar"><h1>🏋️ Scheda Allenamento</h1><div class="wk-badge" id="wBadge">SETT 1-2</div></div>
 <div class="week-row" id="weekRow"></div>
-<div class="prog-wrap">
-  <div class="prog-bar"><div class="prog-fill" id="progFill"></div></div>
-  <div class="prog-txt" id="progTxt">0 / 0</div>
-</div>
+<div class="prog-wrap"><div class="prog-bar"><div class="prog-fill" id="progFill"></div></div><div class="prog-txt" id="progTxt">0 / 0</div></div>
 <div class="day-row" id="dayRow"></div>
-<div class="qt-row">
-  <button class="qt-btn" onclick="tmStart(30)">0:30</button>
-  <button class="qt-btn" onclick="tmStart(45)">0:45</button>
-  <button class="qt-btn" onclick="tmStart(60)">1:00</button>
-  <button class="qt-btn" onclick="tmStart(90)">1:30</button>
-</div>
+<div class="qt-row"><button class="qt-btn" onclick="tmStart(30)">0:30</button><button class="qt-btn" onclick="tmStart(45)">0:45</button><button class="qt-btn" onclick="tmStart(60)">1:00</button><button class="qt-btn" onclick="tmStart(90)">1:30</button></div>
 <div class="content" id="content"></div>
-<div class="timer-bar" id="tmBar">
-  <div class="t-display" id="tmDisp">0:00</div>
-  <div class="t-info"><strong>Recupero</strong><span>Riposo tra le serie</span></div>
-  <div class="t-btns">
-    <button class="t-btn sec" onclick="tmStop()">✕</button>
-    <button class="t-btn pri" id="tmToggle" onclick="tmPause()">⏸</button>
-  </div>
-</div>
+<div class="timer-bar" id="tmBar"><div class="t-display" id="tmDisp">0:00</div><div class="t-info"><strong>Recupero</strong><span>Riposo tra le serie</span></div><div class="t-btns"><button class="t-btn sec" onclick="tmStop()">✕</button><button class="t-btn pri" id="tmToggle" onclick="tmPause()">⏸</button></div></div>
 <div class="confetti" id="confetti"></div>
-
 <script>
-// ═══════════════════════════════════════
-// DATA
-// ═══════════════════════════════════════
-const WE = [
-  { n:"Rotazioni polsi", s:"2", r:"15/lato", t:"Lente e controllate" },
-  { n:"Flessione/estensione polso 1kg", s:"2", r:"12", t:"Palmo alto poi basso" },
-  { n:"Pronazione/supinazione avambraccio", s:"2", r:"12", t:"1kg, gomito fermo" },
-  { n:"Estensione eccentrica polso", s:"2", r:"10", t:"Discesa lenta 3s" },
-  { n:"Squeeze asciugamano", s:"2", r:"10 (5s hold)", t:"Presa leggera, no dolore" },
-];
-const WG = [
-  { n:"Circonduzioni spalle", s:"1", r:"15/dir", t:"Ampio raggio" },
-  { n:"Cat-cow", s:"1", r:"10", t:"Respira profondamente" },
-  { n:"Dead hang alla sbarra", s:"1", r:"20-30s", t:"Presa rilassata" },
-];
-const CD = [
-  { n:"Child pose", s:"1", r:"30s", t:"Respira profondamente" },
-  { n:"Stretching pettorali al muro", s:"1/lato", r:"20s", t:"Ruota il busto" },
-  { n:"Stretching avambraccio", s:"1/lato", r:"20s", t:"Braccio teso, tira dita" },
-  { n:"Ginocchia al petto", s:"1", r:"30s", t:"Rilassa bassa schiena" },
-  { n:"Respirazione diaframmatica", s:"1", r:"5 respiri", t:"4s inspira, 6s espira" },
-];
+const DESC={"Rotazioni polsi":"Estendi le braccia davanti a te. Ruota i polsi lentamente facendo cerchi completi: 15 in senso orario, poi 15 antiorario. Dita rilassate.","Flessione/estensione polso 1kg":"Seduto, appoggia l'avambraccio sul ginocchio col polso che sporge. Con 1kg, piega il polso verso l'alto (palmo su) per 12 rep, poi gira la mano (palmo giù) e fai altre 12.","Estensione eccentrica polso":"L'esercizio chiave per l'epitrocleite! Avambraccio sul ginocchio, palmo giù, 1kg. Aiutati con l'altra mano a portare il polso su, poi LENTAMENTE lascia scendere contando 3 secondi. È la discesa che cura.","Squeeze asciugamano":"Arrotola un asciugamano e stringilo. Mantieni 5 secondi, rilascia. Usa circa il 60-70% della forza, non al massimo. Se il gomito fa male, riduci.","Circonduzioni spalle":"In piedi, braccia lungo i fianchi. Grandi cerchi con entrambe le spalle: 15 avanti, 15 indietro. Più ampi possibile.","Cat-cow":"A quattro zampe, mani sotto spalle, ginocchia sotto anche. Inspira → inarca la schiena verso il basso (cow). Espira → arrotonda verso l'alto (cat). Segui il respiro.","Dead hang":"Appenditi alla sbarra, presa prona, larghezza spalle. Rilassa tutto il corpo e lascia che la gravità allunghi la colonna. Respira normalmente.","Plank frontale":"Avambracci a terra, gomiti sotto le spalle, corpo in linea retta testa-piedi. Contrai addome e glutei. NON far cadere i fianchi né alzare il sedere.","Dead bug":"Sdraiato, braccia verso il soffitto, ginocchia a 90°. Stendi braccio dx dietro la testa e gamba sx in avanti, mantenendo la schiena INCOLLATA al pavimento. Torna e alterna.","Trazioni presa stretta":"Presa prona, mani alla larghezza spalle. Tira fino al mento sopra la sbarra, scendi controllato. Meno stress sul gomito rispetto alla presa larga.","Superman hold":"A pancia in giù, braccia tese avanti. Solleva braccia, petto e gambe da terra. Stringi glutei e bassa schiena. Non trattenere il respiro.","Bird dog":"A quattro zampe. Stendi braccio dx avanti e gamba sx indietro, schiena dritta. Mantieni 2s e alterna. Immagina un bicchiere sulla schiena: non deve cadere.","Push-up":"Mani a terra leggermente più larghe delle spalle. Scendi piegando i gomiti a ~45° dal corpo. Petto sfiora il pavimento, spingi su.","Plank laterale":"Su un fianco, avambraccio a terra, gomito sotto la spalla. Solleva i fianchi: linea retta dalla testa ai piedi. Se i fianchi cadono, immagina una corda che ti tira al soffitto.","Australian pull-up":"Sbarra all'altezza petto (o tavolo robusto). Appenditi sotto, piedi a terra, corpo rigido. Tira il petto verso la sbarra. Più i piedi sono avanti, più è difficile.","Mountain climber lento":"Posizione push-up. Porta un ginocchio al petto, riportalo indietro, poi l'altro. Fallo LENTO: obiettivo è il core, non il cardio.","Back extension prono":"A pancia in giù, mani alle tempie. Solleva il petto da terra contraendo la bassa schiena. Non iperestendere: sali fino a dove è comodo.","Plank tocco spalla":"In posizione push-up, tocca la spalla sx con mano dx. Rimetti giù e alterna. Il bacino deve restare FERMO, non oscillare.","Curl martello 5kg":"Come il curl classico ma col pollice verso l'alto (come un martello). Presa neutra = meno stress sull'epitrocleite. Ottimo per te.","Renegade row 5kg":"Posizione push-up con mani sui pesi da 5kg. Tira un peso verso il fianco, appoggialo, poi l'altro. Corpo rigido, niente rotazione. Allarga i piedi se difficile.","Superman + flutter":"Posizione superman, poi calci alternati con le gambe come a stile libero. Perfetto per te da ex pallanuotista!","Bird dog + crunch":"Come il bird dog ma al ritorno porta gomito e ginocchio a toccarsi sotto la pancia, poi ri-estendi. Core dinamico.","Curl martello 5kg":"Come il curl ma con presa neutra (pollice su). Meno stress per il gomito, ideale per l'epitrocleite.","Hollow body hold":"Sdraiato, premi la lombare a terra. Solleva spalle e gambe tese. Più le gambe sono basse, più è difficile. Lombare SEMPRE a terra.","Good morning":"In piedi, mani dietro la testa. Piegati avanti facendo perno sulle anche, schiena dritta. Scendi fino a sentire i femorali, risali contraendo glutei e bassa schiena.","Bent-over row 5kg":"Busto inclinato 45°, schiena dritta, un peso per mano. Tira verso le anche stringendo le scapole in alto. Scendi lento, niente slancio.","Bicycle crunch":"Sdraiato, mani alle tempie. Gomito dx verso ginocchio sx ruotando il busto, gamba dx stesa. Alterna LENTAMENTE.","Dead bug avanzato":"Come il dead bug ma gambe completamente tese (non piegate). Molto più difficile. Aggiungi 1kg tra le mani per extra resistenza.","Trazioni presa larga":"Presa prona, mani più larghe delle spalle. Tira il mento sopra la sbarra, scendi controllato. Lavora molto il gran dorsale.","Commando plank":"Plank sugli avambracci → sali su una mano, poi l'altra (arrivi in push-up) → torna giù. Alterna il braccio che parte.","Back extension + twist":"Prono, mani alle tempie. Solleva il petto e ruota verso destra, torna al centro, scendi. Rep dopo ruota a sinistra.","Bird dog + hold 5s":"Bird dog classico ma mantieni la posizione 5 secondi prima di tornare. La pausa aumenta molto il lavoro stabilizzante.","Push-up declinato":"Push-up con piedi su sedia. Aumenta il carico su parte alta petto e spalle.","Curl concentrato 5kg":"Seduto, gomito appoggiato all'interno del ginocchio. Piega il braccio verso la spalla. Il ginocchio blocca il gomito: impossibile barare.","Side bend 5kg":"In piedi, peso in una mano. Inclinati dal lato del peso, torna su contraendo l'obliquo opposto. Solo laterale, mai avanti/indietro.","Plank laterale + rotazione":"In plank laterale, porta il braccio libero sotto il corpo ruotando, poi torna verso il soffitto. Obliqui e stabilità.","Trazioni miste":"Una mano prona, l'altra supina. Fai trazioni così, alterna posizione ogni serie.","Mountain climber veloce":"Come il mountain climber ma a ritmo sostenuto. Core contratto, schiena dritta. Diventa anche cardio.","Flutter kicks":"Sdraiato, mani sotto i glutei, lombare premuta a terra. Gambe tese sollevate, piccoli calci alternati.","Good morning 5kg":"Come il good morning ma con 5kg tenuto al petto. Più lavoro su bassa schiena e femorali.","Pallof press":"Fissa un asciugamano alla maniglia di una porta chiusa. Tieni l'estremità con le mani al petto. Stendi le braccia resistendo alla rotazione. Ottimo per obliqui.","Plank up-down":"Plank sugli avambracci → sali sulle mani → torna giù. Come il commando plank con ritmo costante.","Knee raise sbarra":"Appeso alla sbarra, porta le ginocchia al petto flettendo le anche. Controllato, senza slancio.","Plank con peso":"Plank classico con 5kg sulla schiena. Posiziona il peso prima di metterti in posizione.","Renegade row + push-up":"Push-up, poi remata dx, poi remata sx. Questo è 1 rep. Combo killer per core, petto e schiena.","Reverse plank":"Seduto, mani dietro i glutei, dita verso i piedi. Solleva il bacino: linea dritta spalle-piedi. Stringi glutei e core.","L-sit alla sbarra":"Appeso, solleva gambe tese a 90° (forma L). Mantieni. Se troppo difficile piega le ginocchia.","Bird dog row 5kg":"Quadrupedia con peso. Stendi braccio e gamba opposta (bird dog), poi tira il peso (row) mantenendo la posizione. Molto impegnativo.","Chin-up":"Presa supina (palmi verso te), larghezza spalle. Tira il mento sopra. Enfatizza molto i bicipiti.","Curl 21s":"7 rep nella metà bassa, 7 nella metà alta, 7 complete. Senza pausa. Brucia parecchio!","Plank laterale + hip dip":"In plank laterale, abbassa il fianco verso terra e risali. Non toccare il pavimento. Obliqui al fuoco.","Hanging knee raise":"Appeso alla sbarra, ginocchia al petto, scendi controllato. No dondolio.","Plank to pike":"In plank braccia tese, porta i fianchi al soffitto formando V rovesciata. Torna in plank. Core e spalle.","Burpee modificato":"Accovacciati, mani a terra, salta indietro in plank, push-up, salta avanti, torna in piedi. Niente salto finale.","Hollow body rock":"Come l'hollow body hold ma dondola leggermente avanti-indietro mantenendo la forma. Se la lombare si stacca, torna alla versione statica.","Dead hang max":"Appenditi e resta il più possibile. Presa prona, spalle rilassate. Decompressione colonna + allenamento presa.","Good morning 5kg x2":"Good morning con due pesi da 5kg, uno per mano lungo i fianchi. Versione più intensa.","Pallof press + rotazione":"Braccia tese in Pallof, ruota lentamente il busto nella direzione opposta alla resistenza. Anti-rotazione dinamica.","Single arm row 5kg":"Ginocchio e mano su sedia, l'altra mano tiene il peso. Tira verso il fianco stringendo la scapola. Schiena sempre dritta.","Russian twist 5kg":"Seduto, schiena inclinata, piedi sollevati, peso al petto. Ruota il busto dx e sx. Un lato = 1 rep.","Leg raise sbarra":"Appeso, gambe tese fino all'orizzontale. Scendi controllato. Versione avanzata del knee raise.","Wall sit":"Schiena al muro, scivola fino a ginocchia a 90°. Mantieni. Le gambe bruciano ma è un gran isometrico.","Ginocchia al petto":"Sdraiato, porta entrambe le ginocchia al petto con le mani. Tieni 30 secondi respirando. Rilassa la bassa schiena.","Stretching avambraccio":"Braccio teso davanti, palmo verso l'alto. Con l'altra mano tira le dita verso il basso. Tieni 15 secondi. Poi gira il palmo verso il basso e tira le dita verso di te. Fondamentale per l'epitrocleite.","Australian pull-up elevato":"Come l'Australian pull-up ma piedi su sedia. Corpo più orizzontale = più difficile.","Reverse snow angel +1kg":"Reverse snow angel con 1kg per mano. Più lavoro su scapole e parte alta schiena.","Push-up declinato stretto":"Piedi su sedia, mani vicine. Carico extra + enfasi tricipiti.","Commando plank veloce":"Commando plank a ritmo sostenuto. Se i fianchi oscillano troppo, rallenta.","Plank tocco spalla+ginocchio":"In push-up, tocca spalla opposta poi porta ginocchio opposto al gomito. Torna e alterna. Core sempre attivo.","Pallof press isometrico":"Pallof press con braccia tese ferme 15 secondi. Resisti alla rotazione. Sentirai gli obliqui.","Pallof press camminata":"Braccia tese in Pallof, cammina lateralmente 10 passi. Core attivo contro la rotazione."};
 
-const W = {
-"1-2":{ l:"Sett 1-2", d:"~15 min", f:"Basi", days:{
-  A:{ tt:"Core & Trazioni", ex:[
-    {n:"Plank frontale",s:"3",r:"30s",t:"Schiena dritta, core attivo"},
-    {n:"Dead bug",s:"3",r:"8/lato",t:"Lento, lombare a terra"},
-    {n:"Superman hold",s:"3",r:"20s",t:"Attiva bassa schiena"},
-    {n:"Trazioni presa larga",s:"3",r:"4-6",t:"Negative 5s se serve"},
-    {n:"Push-up",s:"3",r:"8-10",t:"Gomiti non troppo aperti"},
-  ]},
-  B:{ tt:"Schiena & Braccia", ex:[
-    {n:"Plank laterale",s:"2/lato",r:"20s",t:"Anche allineate"},
-    {n:"Bird dog",s:"3",r:"8/lato",t:"Mantieni 2s"},
-    {n:"Reverse snow angel",s:"3",r:"10",t:"Braccia tese, solleva"},
-    {n:"Australian pull-up",s:"3",r:"8",t:"Corpo inclinato"},
-    {n:"Curl bicipiti 5kg",s:"2",r:"10",t:"Presa supina, lento"},
-  ]},
-  C:{ tt:"Core Dinamico & Upper", ex:[
-    {n:"Mountain climber lento",s:"3",r:"10/lato",t:"Core contratto"},
-    {n:"Hollow body hold",s:"3",r:"20s",t:"Lombare a terra"},
-    {n:"Prone Y-T-W raises",s:"2",r:"8/posiz.",t:"Scapole attive"},
-    {n:"Trazioni presa stretta",s:"3",r:"4-6",t:"Meno stress gomito"},
-    {n:"Diamond push-up mod.",s:"2",r:"6-8",t:"Ginocchia a terra se serve"},
-  ]},
-  "★":{ tt:"Bonus — Anti-rotazione", ex:[
-    {n:"Pallof press (asciugamano)",s:"3",r:"10/lato",t:"Anti-rotazione"},
-    {n:"Plank tocco spalla",s:"3",r:"8/lato",t:"Non ruotare le anche"},
-    {n:"Back extension prono",s:"3",r:"12",t:"Solleva petto e gambe"},
-    {n:"Pendlay row 5kg",s:"3",r:"10",t:"Schiena parallela"},
-  ]},
-}},
-"3-4":{ l:"Sett 3-4", d:"~20 min", f:"Volume", days:{
-  A:{ tt:"Core & Trazioni", ex:[
-    {n:"Plank frontale",s:"3",r:"40s",t:"Stringi glutei e addome"},
-    {n:"Dead bug gambe tese",s:"3",r:"10/lato",t:"Aumenta leva"},
-    {n:"Superman + flutter",s:"3",r:"30s",t:"Gambe alternate"},
-    {n:"Trazioni presa larga",s:"4",r:"5-7",t:"Mento sopra sbarra"},
-    {n:"Push-up",s:"3",r:"12",t:"Scendi 3s"},
-    {n:"Renegade row 5kg",s:"3",r:"8/lato",t:"Posizione plank"},
-  ]},
-  B:{ tt:"Schiena & Braccia", ex:[
-    {n:"Plank laterale",s:"3/lato",r:"25s",t:"Solleva il fianco"},
-    {n:"Bird dog + crunch",s:"3",r:"10/lato",t:"Gomito tocca ginocchio"},
-    {n:"Reverse snow angel +1kg",s:"3",r:"12",t:"1kg per mano"},
-    {n:"Australian pull-up elevato",s:"3",r:"10",t:"Piedi su sedia"},
-    {n:"Curl martello 5kg",s:"3",r:"10",t:"Presa neutra"},
-    {n:"Plank walk-out",s:"3",r:"6",t:"Da in piedi a plank"},
-  ]},
-  C:{ tt:"Core Dinamico & Upper", ex:[
-    {n:"Mountain climber",s:"3",r:"15/lato",t:"Ritmo moderato"},
-    {n:"Hollow body rock",s:"3",r:"15s",t:"Mantieni forma"},
-    {n:"Y-T-W raises 1kg",s:"2",r:"10/posiz.",t:"Scapole attive"},
-    {n:"Trazioni presa stretta",s:"4",r:"5-7",t:"Enfasi bicipiti"},
-    {n:"Push-up declinato",s:"3",r:"8-10",t:"Piedi su sedia"},
-    {n:"Commando plank",s:"3",r:"8/lato",t:"Alterna braccia"},
-  ]},
-  "★":{ tt:"Bonus — Anti-rotazione", ex:[
-    {n:"Pallof press isometrico",s:"3",r:"15s/lato",t:"Braccia tese"},
-    {n:"Plank tocco spalla+ginocchio",s:"3",r:"10/lato",t:"Opposti"},
-    {n:"Good morning corpo libero",s:"3",r:"12",t:"Mani dietro testa"},
-    {n:"Bent-over row 5kg x2",s:"3",r:"12",t:"Tira verso anche"},
-    {n:"Bicycle crunch",s:"3",r:"15/lato",t:"Lento e controllato"},
-  ]},
-}},
-"5-6":{ l:"Sett 5-6", d:"~25 min", f:"Avanzato", days:{
-  A:{ tt:"Core & Trazioni", ex:[
-    {n:"Plank frontale",s:"3",r:"50s",t:"Glutei, core, dorsali"},
-    {n:"Dead bug con 1kg",s:"3",r:"10/lato",t:"Peso tra le mani"},
-    {n:"Superman alternato",s:"3",r:"12/lato",t:"Braccio dx + gamba sx"},
-    {n:"Trazioni presa larga",s:"4",r:"6-8",t:"Pausa 1s in alto"},
-    {n:"Push-up archer",s:"3",r:"6/lato",t:"Un braccio si allarga"},
-    {n:"Renegade row 5kg",s:"3",r:"10/lato",t:"Più lento"},
-    {n:"Reverse plank",s:"3",r:"25s",t:"Solleva bacino"},
-  ]},
-  B:{ tt:"Schiena & Braccia", ex:[
-    {n:"Plank laterale + rotazione",s:"3/lato",r:"10",t:"Ruota braccio sotto"},
-    {n:"Bird dog + hold 5s",s:"3",r:"8/lato",t:"Mantieni estensione"},
-    {n:"I-Y-T-W raises 1kg",s:"3",r:"8/posiz.",t:"Aggiungi I"},
-    {n:"Trazioni miste",s:"3",r:"5-6",t:"Alterna supina/prona"},
-    {n:"Curl concentrato 5kg",s:"3",r:"8/lato",t:"Gomito su ginocchio"},
-    {n:"Walk-out + push-up",s:"3",r:"6",t:"Combo completa"},
-    {n:"Side bend 5kg",s:"3",r:"12/lato",t:"Core attivo"},
-  ]},
-  C:{ tt:"Core Dinamico & Upper", ex:[
-    {n:"Mountain climber veloce",s:"3",r:"20/lato",t:"30s riposo"},
-    {n:"Hollow body hold",s:"3",r:"30s",t:"Braccia sopra testa"},
-    {n:"Back extension + twist",s:"3",r:"10/lato",t:"Solleva e ruota"},
-    {n:"Trazioni max rep",s:"3",r:"Max",t:"Cedimento controllato"},
-    {n:"Push-up declinato",s:"3",r:"12",t:"3s eccentrica"},
-    {n:"Commando plank",s:"3",r:"10/lato",t:"Ritmo costante"},
-    {n:"Flutter kicks",s:"3",r:"20/lato",t:"Gambe basse"},
-  ]},
-  "★":{ tt:"Bonus — Anti-rotazione", ex:[
-    {n:"Pallof press + rotazione",s:"3",r:"10/lato",t:"Contro resistenza"},
-    {n:"Plank up-down",s:"3",r:"10",t:"Avambracci ↔ mani"},
-    {n:"Good morning 5kg",s:"3",r:"12",t:"Peso al petto"},
-    {n:"Bent-over row 5kg x2",s:"4",r:"12",t:"Pausa 1s in alto"},
-    {n:"Bicycle crunch lento",s:"3",r:"20/lato",t:"3s per lato"},
-    {n:"Knee raise sbarra",s:"3",r:"8",t:"Ginocchia al petto"},
-  ]},
-}},
-"7-8":{ l:"Sett 7-8", d:"~30+ min", f:"Max", days:{
-  A:{ tt:"Core & Trazioni", ex:[
-    {n:"Plank con 5kg",s:"3",r:"45s",t:"Peso sulla schiena"},
-    {n:"Dead bug avanzato +1kg",s:"3",r:"10/lato",t:"Gambe tese + peso"},
-    {n:"Superman + squeeze",s:"3",r:"30s",t:"Stringi glutei e dorsali"},
-    {n:"Trazioni presa larga",s:"4",r:"7-9",t:"Pausa 2s in alto"},
-    {n:"Push-up one-arm elevated",s:"3",r:"8/lato",t:"Mano su rialzo"},
-    {n:"Renegade row + push-up",s:"3",r:"8/lato",t:"Row+push-up = 1 rep"},
-    {n:"Reverse plank leg lift",s:"3",r:"8/lato",t:"Alterna gambe"},
-    {n:"L-sit alla sbarra",s:"3",r:"10-15s",t:"Gambe tese davanti"},
-  ]},
-  B:{ tt:"Schiena & Braccia", ex:[
-    {n:"Plank laterale + hip dip",s:"3/lato",r:"12",t:"Scendi e risali"},
-    {n:"Bird dog row 5kg",s:"3",r:"8/lato",t:"Quadrupedia + peso"},
-    {n:"I-Y-T-W 1kg lento",s:"3",r:"10/posiz.",t:"4s per rep"},
-    {n:"Chin-up supine",s:"4",r:"6-8",t:"Enfasi bicipiti"},
-    {n:"Curl 21s con 5kg",s:"2",r:"21 (7+7+7)",t:"7 basse, 7 alte, 7 full"},
-    {n:"Walk-out+push-up+row",s:"3",r:"5",t:"Combo completa"},
-    {n:"Side bend 5kg",s:"3",r:"15/lato",t:"Contrai obliqui"},
-    {n:"Hanging knee raise",s:"3",r:"10",t:"No slancio"},
-  ]},
-  C:{ tt:"Core Dinamico & Upper", ex:[
-    {n:"Burpee modificato",s:"3",r:"8",t:"Plank+push-up+in piedi"},
-    {n:"Hollow body rock",s:"3",r:"30s",t:"Forma perfetta"},
-    {n:"Back extension + Y raise",s:"3",r:"10",t:"Solleva + Y"},
-    {n:"Trazioni miste",s:"4",r:"6-8",t:"Alterna presa"},
-    {n:"Push-up declinato stretto",s:"3",r:"10",t:"Enfasi tricipiti"},
-    {n:"Commando plank veloce",s:"3",r:"12/lato",t:"Ritmo sostenuto"},
-    {n:"Flutter kicks",s:"3",r:"30/lato",t:"Core attivo"},
-    {n:"Dead hang max",s:"2",r:"Max",t:"Decompressione e grip"},
-  ]},
-  "★":{ tt:"Bonus — Anti-rotazione", ex:[
-    {n:"Pallof press camminata",s:"3",r:"10 passi/lato",t:"Lateralmente"},
-    {n:"Plank to pike",s:"3",r:"10",t:"Fianchi in alto"},
-    {n:"Good morning 5kg x2",s:"3",r:"12",t:"Un peso per mano"},
-    {n:"Single arm row 5kg",s:"4",r:"12/lato",t:"Appoggiato a sedia"},
-    {n:"Russian twist 5kg",s:"3",r:"15/lato",t:"Piedi sollevati"},
-    {n:"Leg raise sbarra",s:"3",r:"10",t:"Gambe tese"},
-    {n:"Wall sit",s:"2",r:"45s",t:"Schiena al muro, 90°"},
-  ]},
-}},
-};
+const WE=[{n:"Rotazioni polsi",s:"2",r:"15/lato",t:"Lente e controllate"},{n:"Flessione/estensione polso 1kg",s:"2",r:"12",t:"Palmo alto poi basso"},{n:"Estensione eccentrica polso",s:"2",r:"10",t:"Discesa lenta 3s — esercizio chiave!"},{n:"Squeeze asciugamano",s:"2",r:"10 (5s hold)",t:"Presa leggera, no dolore"}];
+const WG=[{n:"Circonduzioni spalle",s:"1",r:"15/dir",t:"Ampio raggio"},{n:"Cat-cow",s:"1",r:"8",t:"Segui il respiro"},{n:"Dead hang",s:"1",r:"20s",t:"Rilassa tutto"}];
+const CD=[{n:"Ginocchia al petto",s:"1",r:"30s",t:"Rilassa bassa schiena"},{n:"Stretching avambraccio",s:"1/lato",r:"15s",t:"Fondamentale per il gomito"}];
 
-// ═══════════════════════════════════════
-// STATE
-// ═══════════════════════════════════════
-let cW = "1-2", cD = "A";
-let done = {};
-try { const s = localStorage.getItem("wk_done"); if(s) done = JSON.parse(s); } catch(e){}
-function save() { try { localStorage.setItem("wk_done", JSON.stringify(done)); } catch(e){} }
-function key() { return cW+"_"+cD; }
-function getDone(w,d) { return done[w+"_"+d] || []; }
-function getTotal(w,d) { return WE.length + WG.length + W[w].days[d].ex.length + CD.length; }
+const W={"1-2":{l:"Sett 1-2",d:"~15 min",days:{A:{tt:"Core & Trazioni",ex:[{n:"Plank frontale",s:"3",r:"20s",t:"Schiena dritta, respira"},{n:"Dead bug",s:"2",r:"6/lato",t:"Lombare incollata a terra"},{n:"Trazioni presa stretta",s:"3",r:"3-5",t:"Negative 5s se serve"}]},B:{tt:"Schiena & Core",ex:[{n:"Superman hold",s:"3",r:"15s",t:"Stringi glutei"},{n:"Bird dog",s:"2",r:"6/lato",t:"Mantieni 2s"},{n:"Push-up",s:"3",r:"6-8",t:"Scendi controllato"}]},C:{tt:"Mix Completo",ex:[{n:"Plank laterale",s:"2/lato",r:"15s",t:"Fianchi alti"},{n:"Australian pull-up",s:"3",r:"6",t:"Corpo rigido"},{n:"Mountain climber lento",s:"2",r:"8/lato",t:"Core contratto"}]},"★":{tt:"Bonus — Bassa Schiena",ex:[{n:"Back extension prono",s:"3",r:"10",t:"Non iperestendere"},{n:"Plank tocco spalla",s:"2",r:"6/lato",t:"Bacino fermo"},{n:"Curl martello 5kg",s:"2",r:"8",t:"Presa neutra, meno stress gomito"}]}}},"3-4":{l:"Sett 3-4",d:"~20 min",days:{A:{tt:"Core & Trazioni",ex:[{n:"Plank frontale",s:"3",r:"30s",t:"Stringi glutei e addome"},{n:"Dead bug",s:"3",r:"8/lato",t:"Gambe più tese"},{n:"Trazioni presa stretta",s:"3",r:"4-6",t:"Mento sopra la sbarra"},{n:"Renegade row 5kg",s:"2",r:"6/lato",t:"Posizione plank stabile"}]},B:{tt:"Schiena & Core",ex:[{n:"Superman + flutter",s:"3",r:"20s",t:"Come nuotare a stile!"},{n:"Bird dog + crunch",s:"3",r:"8/lato",t:"Gomito tocca ginocchio"},{n:"Push-up",s:"3",r:"10",t:"Scendi 3 secondi"},{n:"Curl martello 5kg",s:"2",r:"10",t:"Presa neutra"}]},C:{tt:"Mix Completo",ex:[{n:"Plank laterale",s:"2/lato",r:"20s",t:"Solleva dal basso"},{n:"Australian pull-up elevato",s:"3",r:"8",t:"Piedi su sedia"},{n:"Mountain climber lento",s:"3",r:"10/lato",t:"Ritmo costante"},{n:"Hollow body hold",s:"3",r:"15s",t:"Lombare a terra!"}]},"★":{tt:"Bonus — Bassa Schiena",ex:[{n:"Good morning",s:"3",r:"10",t:"Mani dietro la testa"},{n:"Plank tocco spalla",s:"3",r:"8/lato",t:"Niente rotazione"},{n:"Bicycle crunch",s:"2",r:"10/lato",t:"Lento"},{n:"Bent-over row 5kg",s:"3",r:"10",t:"Scapole strette"}]}}},"5-6":{l:"Sett 5-6",d:"~25 min",days:{A:{tt:"Core & Trazioni",ex:[{n:"Plank frontale",s:"3",r:"40s",t:"Attiva tutto"},{n:"Dead bug avanzato",s:"3",r:"8/lato",t:"Gambe tese + 1kg"},{n:"Trazioni presa larga",s:"3",r:"5-7",t:"Pausa 1s in alto"},{n:"Renegade row 5kg",s:"3",r:"8/lato",t:"Più lento"},{n:"Commando plank",s:"3",r:"6/lato",t:"Alterna braccia"}]},B:{tt:"Schiena & Core",ex:[{n:"Back extension + twist",s:"3",r:"8/lato",t:"Solleva e ruota"},{n:"Bird dog + hold 5s",s:"3",r:"8/lato",t:"Pausa in estensione"},{n:"Push-up declinato",s:"3",r:"8",t:"Piedi su sedia"},{n:"Curl concentrato 5kg",s:"2",r:"8/lato",t:"Gomito fermo"},{n:"Side bend 5kg",s:"2",r:"10/lato",t:"Solo laterale"}]},C:{tt:"Mix Completo",ex:[{n:"Plank laterale + rotazione",s:"2/lato",r:"8",t:"Braccio sotto il corpo"},{n:"Trazioni miste",s:"3",r:"5-6",t:"Alterna mani ogni serie"},{n:"Mountain climber veloce",s:"3",r:"15/lato",t:"30s riposo"},{n:"Hollow body hold",s:"3",r:"25s",t:"Braccia sopra la testa"},{n:"Flutter kicks",s:"3",r:"15/lato",t:"Gambe basse"}]},"★":{tt:"Bonus — Anti-rotazione",ex:[{n:"Good morning 5kg",s:"3",r:"10",t:"Peso al petto"},{n:"Pallof press",s:"3",r:"8/lato",t:"Resisti alla rotazione"},{n:"Plank up-down",s:"3",r:"8",t:"Avambracci ↔ mani"},{n:"Bicycle crunch",s:"3",r:"15/lato",t:"3s per lato"},{n:"Knee raise sbarra",s:"2",r:"6",t:"No slancio"}]}}},"7-8":{l:"Sett 7-8",d:"~30+ min",days:{A:{tt:"Core & Trazioni",ex:[{n:"Plank con peso",s:"3",r:"40s",t:"5kg sulla schiena"},{n:"Dead bug avanzato",s:"3",r:"10/lato",t:"Gambe tese + 1kg"},{n:"Trazioni presa larga",s:"4",r:"6-8",t:"Pausa 2s in alto"},{n:"Renegade row + push-up",s:"3",r:"6/lato",t:"Row+push-up = 1 rep"},{n:"Reverse plank",s:"3",r:"25s",t:"Bacino alto"},{n:"L-sit alla sbarra",s:"3",r:"10-15s",t:"Gambe tese"}]},B:{tt:"Schiena & Core",ex:[{n:"Back extension + twist",s:"3",r:"10/lato",t:"Controllato"},{n:"Bird dog row 5kg",s:"3",r:"8/lato",t:"Equilibrio + forza"},{n:"Chin-up",s:"4",r:"6-8",t:"Enfasi bicipiti"},{n:"Curl 21s",s:"2",r:"21 (7+7+7)",t:"Non mollare!"},{n:"Plank laterale + hip dip",s:"3/lato",r:"10",t:"Scendi e risali"},{n:"Hanging knee raise",s:"3",r:"8",t:"No slancio"}]},C:{tt:"Mix Completo",ex:[{n:"Plank to pike",s:"3",r:"8",t:"Fianchi al soffitto"},{n:"Trazioni miste",s:"4",r:"6-8",t:"Alterna presa"},{n:"Burpee modificato",s:"3",r:"6",t:"Senza salto"},{n:"Hollow body rock",s:"3",r:"25s",t:"Mantieni forma"},{n:"Flutter kicks",s:"3",r:"25/lato",t:"Core attivo"},{n:"Dead hang max",s:"2",r:"Max",t:"Decompressione"}]},"★":{tt:"Bonus — Anti-rotazione",ex:[{n:"Good morning 5kg x2",s:"3",r:"12",t:"Un peso per mano"},{n:"Pallof press + rotazione",s:"3",r:"8/lato",t:"Contro resistenza"},{n:"Single arm row 5kg",s:"3",r:"10/lato",t:"Appoggiato a sedia"},{n:"Russian twist 5kg",s:"3",r:"12/lato",t:"Piedi sollevati"},{n:"Leg raise sbarra",s:"3",r:"8",t:"Gambe tese"},{n:"Wall sit",s:"2",r:"40s",t:"Schiena al muro, 90°"}]}}}};
 
-// ═══════════════════════════════════════
-// RENDER
-// ═══════════════════════════════════════
-function render() {
-  // Weeks
-  let wh = "";
-  for (const k in W) {
-    wh += `<button class="wk-btn ${k===cW?"on":""}" onclick="selW('${k}')">${W[k].l}<span>${W[k].d}</span></button>`;
-  }
-  document.getElementById("weekRow").innerHTML = wh;
-  document.getElementById("wBadge").textContent = W[cW].l.toUpperCase();
+let cW="1-2",cD="A",openDesc={},done={};
+try{const s=localStorage.getItem("wk_done3");if(s)done=JSON.parse(s)}catch(e){}
+function save(){try{localStorage.setItem("wk_done3",JSON.stringify(done))}catch(e){}}
+function key(){return cW+"_"+cD}
+function getDone(w,d){return done[w+"_"+d]||[]}
+function getTotal(w,d){return WE.length+WG.length+W[w].days[d].ex.length+CD.length}
 
-  // Days
-  let dh = "";
-  for (const dk of ["A","B","C","★"]) {
-    const bn = dk==="★";
-    const on = dk===cD;
-    const dn = getDone(cW,dk).length;
-    const tt = getTotal(cW,dk);
-    const badge = dn>0 ? `<span class="dy-badge show">${dn===tt?"✓":dn}</span>` : `<span class="dy-badge"></span>`;
-    dh += `<button class="dy-btn ${on?"on":""} ${bn?"bonus":""}" onclick="selD('${dk}')">${bn?"★ Bonus":"Giorno "+dk}${badge}</button>`;
-  }
-  document.getElementById("dayRow").innerHTML = dh;
-
-  // Progress
-  const k = key();
-  const doneArr = getDone(cW,cD);
-  const total = getTotal(cW,cD);
-  const pct = total>0 ? (doneArr.length/total*100) : 0;
-  document.getElementById("progFill").style.width = pct+"%";
-  document.getElementById("progTxt").textContent = doneArr.length+" / "+total+" completati";
-
-  // Content
-  const day = W[cW].days[cD];
-  let html = `<div class="day-title">${cD==="★"?"★ ":"Giorno "+cD+" — "}${day.tt}</div>`;
-  let idx = 0;
-
-  html += sec("rehab","🔴","Riabilitazione Gomito");
-  html += `<div class="sec-note">Esegui prima di ogni allenamento. Se senti dolore, riduci il range.</div>`;
-  WE.forEach(e => { html += card(e, idx, doneArr); idx++; });
-
-  html += sec("warm","🟠","Mobilità Generale");
-  WG.forEach(e => { html += card(e, idx, doneArr); idx++; });
-
-  html += sec("main","🔵","Allenamento");
-  day.ex.forEach(e => { html += card(e, idx, doneArr); idx++; });
-
-  html += sec("cool","🟢","Defaticamento");
-  CD.forEach(e => { html += card(e, idx, doneArr); idx++; });
-
-  html += `<div class="reset-row"><button class="reset-btn" onclick="resetDay()">↺ Reset giornata</button></div>`;
-
-  document.getElementById("content").innerHTML = html;
-
-  if (doneArr.length === total && total > 0) celebrate();
+function render(){
+  let wh="";for(const k in W)wh+='<button class="wk-btn '+(k===cW?"on":"")+'" onclick="selW(\''+k+'\')">'+W[k].l+'<span>'+W[k].d+'</span></button>';
+  document.getElementById("weekRow").innerHTML=wh;
+  document.getElementById("wBadge").textContent=W[cW].l.toUpperCase();
+  let dh="";for(const dk of["A","B","C","★"]){const bn=dk==="★",on=dk===cD,dn=getDone(cW,dk).length,tt=getTotal(cW,dk);
+    const badge=dn>0?'<span class="dy-badge show">'+(dn===tt?"✓":dn)+"</span>":'<span class="dy-badge"></span>';
+    dh+='<button class="dy-btn '+(on?"on":"")+" "+(bn?"bonus":"")+'" onclick="selD(\''+dk+'\')">'+(bn?"★ Bonus":"Giorno "+dk)+badge+"</button>";}
+  document.getElementById("dayRow").innerHTML=dh;
+  const doneArr=getDone(cW,cD),total=getTotal(cW,cD),pct=total>0?(doneArr.length/total*100):0;
+  document.getElementById("progFill").style.width=pct+"%";
+  document.getElementById("progTxt").textContent=doneArr.length+" / "+total+" completati";
+  const day=W[cW].days[cD];let html='<div class="day-title">'+(cD==="★"?"★ ":"Giorno "+cD+" — ")+day.tt+"</div>";let idx=0;
+  html+=sec("rehab","🔴","Riabilitazione Gomito")+'<div class="sec-note">Esegui prima di ogni sessione. Se senti dolore, riduci o salta.</div>';
+  WE.forEach(function(e){html+=card(e,idx,doneArr);idx++});
+  html+=sec("warm","🟠","Mobilità Generale");WG.forEach(function(e){html+=card(e,idx,doneArr);idx++});
+  html+=sec("main","🔵","Allenamento");day.ex.forEach(function(e){html+=card(e,idx,doneArr);idx++});
+  html+=sec("cool","🟢","Defaticamento");CD.forEach(function(e){html+=card(e,idx,doneArr);idx++});
+  html+='<div class="reset-row"><button class="reset-btn" onclick="resetDay()">↺ Reset giornata</button></div>';
+  document.getElementById("content").innerHTML=html;
+  if(doneArr.length===total&&total>0)celebrate();
 }
+function sec(cls,ico,title){return '<div class="sec-hdr '+cls+'"><span class="ico">'+ico+'</span><h2>'+title+'</h2></div>';}
+function getDesc(name){if(DESC[name])return DESC[name];for(const k in DESC)if(name.indexOf(k)>=0||k.indexOf(name.split(" ")[0])>=0)return DESC[k];return null;}
+function card(e,idx,doneArr){const d=doneArr.includes(idx),desc=getDesc(e.n),isOpen=openDesc[cW+"_"+cD+"_"+idx];
+  return '<div class="ex '+(d?"done":"")+'"><div class="ex-top" onclick="tog('+idx+')"><div class="chk">'+(d?"✓":"")+'</div><div class="ex-info"><div class="ex-name">'+e.n+'</div><div class="ex-meta"><span class="s">'+e.s+' serie</span><span class="r">'+e.r+"</span></div>"+(e.t?'<div class="ex-notes">💡 '+e.t+"</div>":"")+"</div>"+(desc?'<button class="info-toggle '+(isOpen?"open":"")+'" onclick="event.stopPropagation();toggleInfo('+idx+')">?</button>':"")+'</div>'+(desc?'<div class="ex-desc '+(isOpen?"open":"")+'"><div class="how-label">Come si fa</div><p>'+desc+"</p></div>":"")+"</div>";}
+function selW(w){cW=w;cD="A";openDesc={};render();window.scrollTo(0,0)}
+function selD(d){cD=d;openDesc={};render()}
+function tog(idx){const k2=key();if(!done[k2])done[k2]=[];const i=done[k2].indexOf(idx);if(i>=0)done[k2].splice(i,1);else done[k2].push(idx);save();render()}
+function toggleInfo(idx){const k=cW+"_"+cD+"_"+idx;openDesc[k]=!openDesc[k];render()}
+function resetDay(){done[key()]=[];save();render()}
 
-function sec(cls, ico, title) {
-  return `<div class="sec-hdr ${cls}"><span class="ico">${ico}</span><h2>${title}</h2></div>`;
-}
-
-function card(e, idx, doneArr) {
-  const d = doneArr.includes(idx);
-  return `<div class="ex ${d?"done":""}" onclick="tog(${idx})">
-    <div class="chk">${d?"✓":""}</div>
-    <div class="ex-info">
-      <div class="ex-name">${e.n}</div>
-      <div class="ex-meta"><span class="s">${e.s} serie</span><span class="r">${e.r}</span></div>
-      ${e.t?`<div class="ex-notes">💡 ${e.t}</div>`:""}
-    </div>
-  </div>`;
-}
-
-// ═══════════════════════════════════════
-// INTERACTIONS
-// ═══════════════════════════════════════
-function selW(w) { cW=w; cD="A"; render(); window.scrollTo(0,0); }
-function selD(d) { cD=d; render(); }
-function tog(idx) {
-  const k2 = key();
-  if(!done[k2]) done[k2]=[];
-  const i = done[k2].indexOf(idx);
-  if(i>=0) done[k2].splice(i,1); else done[k2].push(idx);
-  save(); render();
-}
-function resetDay() { done[key()]=[]; save(); render(); }
-
-// ═══════════════════════════════════════
-// TIMER
-// ═══════════════════════════════════════
-let tmInt=null, tmSec=0, tmOn=false;
-function tmStart(s) {
-  clearInterval(tmInt); tmSec=s; tmOn=true;
-  document.getElementById("tmBar").classList.add("vis");
-  document.getElementById("tmToggle").textContent="⏸";
-  tmUpd();
-  tmInt = setInterval(()=>{
-    if(!tmOn) return;
-    tmSec--;
-    tmUpd();
-    if(tmSec<=5&&tmSec>0) document.getElementById("tmDisp").className="t-display warn";
-    if(tmSec<=0){
-      clearInterval(tmInt); tmOn=false;
-      document.getElementById("tmDisp").className="t-display go";
-      document.getElementById("tmDisp").textContent="GO!";
-      beep();
-      setTimeout(()=>document.getElementById("tmBar").classList.remove("vis"),2500);
-    }
-  },1000);
-}
-function tmUpd(){
-  const m=Math.floor(tmSec/60), s=tmSec%60;
-  const d=document.getElementById("tmDisp");
-  d.textContent=m+":"+String(s).padStart(2,"0");
-  d.className="t-display";
-}
-function tmPause(){ tmOn=!tmOn; document.getElementById("tmToggle").textContent=tmOn?"⏸":"▶"; }
-function tmStop(){ clearInterval(tmInt); tmOn=false; document.getElementById("tmBar").classList.remove("vis"); }
-
-function beep(){
-  try{
-    const c=new(window.AudioContext||window.webkitAudioContext)();
-    [0,0.2,0.4].forEach(t=>{
-      const o=c.createOscillator(),g=c.createGain();
-      o.connect(g);g.connect(c.destination);
-      o.frequency.value=t<0.3?880:1100;o.type="sine";
-      g.gain.setValueAtTime(0.25,c.currentTime+t);
-      g.gain.exponentialRampToValueAtTime(0.001,c.currentTime+t+0.15);
-      o.start(c.currentTime+t);o.stop(c.currentTime+t+0.15);
-    });
-  }catch(e){}
-}
-
-// ═══════════════════════════════════════
-// CONFETTI
-// ═══════════════════════════════════════
-function celebrate(){
-  const w=document.getElementById("confetti"); w.innerHTML="";
-  const cols=["#58a6ff","#3fb950","#f0883e","#bc8cff","#e3b341","#f85149"];
-  for(let i=0;i<40;i++){
-    const d=document.createElement("div");
-    const sz=6+Math.random()*10;
-    d.style.cssText=`position:absolute;top:-12px;left:${Math.random()*100}%;
-      width:${sz}px;height:${sz}px;border-radius:${Math.random()>0.5?"50%":"2px"};
-      background:${cols[Math.floor(Math.random()*cols.length)]};
-      animation:cfall ${1.2+Math.random()*1.2}s ease-out ${Math.random()*0.4}s forwards;`;
-    w.appendChild(d);
-  }
-  setTimeout(()=>w.innerHTML="",3500);
-}
-
-// Init
+let tmInt=null,tmSec=0,tmOn=false;
+function tmStart(s){clearInterval(tmInt);tmSec=s;tmOn=true;document.getElementById("tmBar").classList.add("vis");document.getElementById("tmToggle").textContent="⏸";tmUpd();
+  tmInt=setInterval(function(){if(!tmOn)return;tmSec--;tmUpd();if(tmSec<=5&&tmSec>0)document.getElementById("tmDisp").className="t-display warn";
+    if(tmSec<=0){clearInterval(tmInt);tmOn=false;document.getElementById("tmDisp").className="t-display go";document.getElementById("tmDisp").textContent="GO!";beep();setTimeout(function(){document.getElementById("tmBar").classList.remove("vis")},2500)}},1000)}
+function tmUpd(){var m=Math.floor(tmSec/60),s=tmSec%60;var d=document.getElementById("tmDisp");d.textContent=m+":"+String(s).padStart(2,"0");d.className="t-display"}
+function tmPause(){tmOn=!tmOn;document.getElementById("tmToggle").textContent=tmOn?"⏸":"▶"}
+function tmStop(){clearInterval(tmInt);tmOn=false;document.getElementById("tmBar").classList.remove("vis")}
+function beep(){try{var c=new(window.AudioContext||window.webkitAudioContext)();[0,.2,.4].forEach(function(t){var o=c.createOscillator(),g=c.createGain();o.connect(g);g.connect(c.destination);o.frequency.value=t<.3?880:1100;o.type="sine";g.gain.setValueAtTime(.25,c.currentTime+t);g.gain.exponentialRampToValueAtTime(.001,c.currentTime+t+.15);o.start(c.currentTime+t);o.stop(c.currentTime+t+.15)})}catch(e){}}
+function celebrate(){var w=document.getElementById("confetti");w.innerHTML="";var cols=["#58a6ff","#3fb950","#f0883e","#bc8cff","#e3b341","#f85149"];
+  for(var i=0;i<40;i++){var d=document.createElement("div");var sz=6+Math.random()*10;d.style.cssText="position:absolute;top:-12px;left:"+Math.random()*100+"%;width:"+sz+"px;height:"+sz+"px;border-radius:"+(Math.random()>.5?"50%":"2px")+";background:"+cols[Math.floor(Math.random()*cols.length)]+";animation:cfall "+(1.2+Math.random()*1.2)+"s ease-out "+Math.random()*.4+"s forwards;";w.appendChild(d)}
+  setTimeout(function(){w.innerHTML=""},3500)}
 render();
 </script>
 </body>
